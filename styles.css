@@ -1,0 +1,12 @@
+* {
+    box-sizing: border-box;
+  }
+  
+  /* Position the image container (needed to position the left and right arrows) */
+  .container {
+    position: relative;
+  }
+
+  .slide {
+    max-width: 200px;
+  }

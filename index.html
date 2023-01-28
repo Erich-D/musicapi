@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Album Finder</title>
+        <link rel="stylesheet" href="styles.css">
+    </head>
+    <body>
+        <input type="text" placeholder="disturbed" oninput="setArtistName(event)">
+        <button onclick="findAlbums()">Get Artist Info</button>
+        <div id="artistInfo" class="container">
+
+        </div>
+    </body>
+    <script>
+        let artistName = "disturbed";
+        let albums = [];
+        let albumCount = 0;
+
+        function setArtistName(e = new Event){
+            const name = e.target.value;
+            artistName = name.toLowerCase().replaceAll(" ","+");
+            console.log(artistName);
+        }
+
+        async function findAlbums(){
+            const httpResponse = await fetch(`https://itunes.apple.com/search?term=${artistName}&entity=album&limit=5`);
+            const body = await httpResponse.json();
+            albums = body.results;
+            albumCount = body.resultCount;
+            renderInfo();
+            console.log(albums)
+        }
+
+        function renderInfo(){
+            const container = document.getElementById("artistInfo");
+            let inc = 0;
+            for(const album in albums){
+                inc += 1;
+                const wrapper = document.createElement("div");
+                wrapper.setAttribute("class","slide");
+                const indx = document.createElement("div");
+                indx.setAttribute("class", "numbertext");
+                indx.innerText = `${inc} / ${albumCount}`;
+                wrapper.appendChild(indx)
+                const ac = document.createElement("img");
+                ac.src = albums[album].artworkUrl100;
+                ac.style = "width:100%";
+                wrapper.appendChild(ac)
+                //name.innerText = albums[album].collectionName;
+                container.appendChild(wrapper)
+                
+            }
+            console.log(albumCount)
+        }
+
+    </script>
+</html>
