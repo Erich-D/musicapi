@@ -15,6 +15,8 @@
         let artistName = "disturbed";
         let albums = [];
         let albumCount = 0;
+        let slideIndex = 1;
+        
 
         function setArtistName(e = new Event){
             const name = e.target.value;
@@ -23,34 +25,121 @@
         }
 
         async function findAlbums(){
-            const httpResponse = await fetch(`https://itunes.apple.com/search?term=${artistName}&entity=album&limit=5`);
+            const httpResponse = await fetch(`https://itunes.apple.com/search?term=${artistName}&entity=album`);
             const body = await httpResponse.json();
             albums = body.results;
             albumCount = body.resultCount;
             renderInfo();
+            showSlides(slideIndex);
             console.log(albums)
         }
 
         function renderInfo(){
             const container = document.getElementById("artistInfo");
+            container.innerHTML = "";
             let inc = 0;
+            //build slide cards
             for(const album in albums){
                 inc += 1;
+                //slide wrapper
                 const wrapper = document.createElement("div");
                 wrapper.setAttribute("class","slide");
+                //index counter
                 const indx = document.createElement("div");
                 indx.setAttribute("class", "numbertext");
                 indx.innerText = `${inc} / ${albumCount}`;
                 wrapper.appendChild(indx)
+                //album image
                 const ac = document.createElement("img");
                 ac.src = albums[album].artworkUrl100;
-                ac.style = "width:100%";
+                ac.style.width = "40%";
                 wrapper.appendChild(ac)
-                //name.innerText = albums[album].collectionName;
-                container.appendChild(wrapper)
-                
+                //sidebar
+                const sb = document.createElement("div");
+                sb.className = "sidebar";
+                sb.style.width = "40%"
+                const gp = document.createElement("p");
+                gp.innerText = albums[album].artistName;
+                sb.appendChild(gp);
+                const rd = document.createElement("p");
+                rd.innerText = albums[album].releaseDate;
+                sb.appendChild(rd);
+                const cr = document.createElement("p");
+                cr.innerText = albums[album].copyright;
+                sb.appendChild(cr);
+                wrapper.appendChild(sb);
+                container.appendChild(wrapper);
             }
+            //buttons for next and previous
+            const prev = document.createElement("a");
+            prev.className = "prev";
+            prev.onclick = function(){plusSlides(-1)};
+            prev.innerText = '\u276e';// Decimal Code: &#10094;
+            container.appendChild(prev);
+            const next = document.createElement("a");
+            next.className = "next";
+            next.onclick = function(){plusSlides(1)};
+            next.innerText = '\u276f';// Decimal Code:	&#10095;
+            container.appendChild(next);
+            //Album name text
+            const cc = document.createElement("div");
+            cc.className = "caption-container";
+            const albnme = document.createElement("p");
+            albnme.id = "caption";
+            cc.appendChild(albnme);
+            container.appendChild(cc);
+            //thumbnails
+                //outer wrapper
+            const row = document.createElement("div");
+            row.className = 'row';
+            inc = 0;
+            for(const album in albums){
+                inc += 1;
+                const col = document.createElement("div");
+                col.className = "column";
+                col.id = inc;
+                const thumb = document.createElement("img");
+                thumb.className = "demo cursor";
+                thumb.src = albums[album].artworkUrl60;
+                thumb.style.width = "100%";
+                thumb.alt = albums[album].collectionName;
+                thumb.onclick = function(){currentSlide(col.id)};
+                col.appendChild(thumb);
+                row.appendChild(col);
+            }
+            container.appendChild(row);
             console.log(albumCount)
+        }
+
+        //functions to control slides
+        
+
+        // Next/previous controls
+        function plusSlides(n) {
+            showSlides(slideIndex += n);
+        }
+
+        // Thumbnail image controls
+        function currentSlide(n) {
+            showSlides(slideIndex = n);
+        }
+
+        function showSlides(n) {
+            let i;
+            let slides = document.getElementsByClassName("slide");
+            let dots = document.getElementsByClassName("demo");
+            let captionText = document.getElementById("caption");
+            if (n > slides.length) {slideIndex = 1}
+            if (n < 1) {slideIndex = slides.length}
+            for (i = 0; i < slides.length; i++) {
+                slides[i].style.display = "none";
+            }
+            for (i = 0; i < dots.length; i++) {
+                dots[i].className = dots[i].className.replace(" active", "");
+            }
+            slides[slideIndex-1].style.display = "flex";
+            dots[slideIndex-1].className += " active";
+            captionText.innerHTML = dots[slideIndex-1].alt;
         }
 
     </script>
