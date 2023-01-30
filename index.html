@@ -33,11 +33,21 @@
             const body = await httpResponse.json();
             albums = body.results;
             albumCount = body.resultCount;
+            console.log(albums);
+            if(albumCount === 0){
+                alert("No results Found");
+                artistName = "";
+                clearInput();
+                return 
+            }
             renderInfo();
             showSlides(slideIndex);
+            clearInput();
+        }
+
+        function clearInput(){
             const input = document.getElementById("bandIn");
             input.value = "";
-            console.log(albums)
         }
 
         function renderInfo(){
