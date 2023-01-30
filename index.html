@@ -5,14 +5,18 @@
         <link rel="stylesheet" href="styles.css">
     </head>
     <body>
-        <input type="text" placeholder="disturbed" oninput="setArtistName(event)">
-        <button onclick="findAlbums()">Get Artist Info</button>
+        <div class="header">
+            <div class="search">
+                <input id="bandIn" type="text" placeholder="Artist or Band Name" oninput="setArtistName(event)">
+                <button onclick="findAlbums()">Get Artist Info</button>
+            </div>
+        </div>
         <div id="artistInfo" class="container">
 
         </div>
     </body>
     <script>
-        let artistName = "disturbed";
+        let artistName = "";
         let albums = [];
         let albumCount = 0;
         let slideIndex = 1;
@@ -31,6 +35,8 @@
             albumCount = body.resultCount;
             renderInfo();
             showSlides(slideIndex);
+            const input = document.getElementById("bandIn");
+            input.value = "";
             console.log(albums)
         }
 
@@ -57,15 +63,22 @@
                 //sidebar
                 const sb = document.createElement("div");
                 sb.className = "sidebar";
-                sb.style.width = "40%"
-                const gp = document.createElement("p");
-                gp.innerText = albums[album].artistName;
+                sb.style.width = "40%";
+                //artist name with link
+                const gp = document.createElement("h1");
+                const alink = document.createElement("a");
+                alink.href = albums[album].artistViewUrl;
+                alink.innerText = albums[album].artistName;//todo add link
+                gp.appendChild(alink);
                 sb.appendChild(gp);
+
                 const rd = document.createElement("p");
-                rd.innerText = albums[album].releaseDate;
+                const d = new Date(albums[album].releaseDate);
+                rd.innerText = formatDate(d);//todo format output
                 sb.appendChild(rd);
                 const cr = document.createElement("p");
                 cr.innerText = albums[album].copyright;
+
                 sb.appendChild(cr);
                 wrapper.appendChild(sb);
                 container.appendChild(wrapper);
@@ -84,8 +97,9 @@
             //Album name text
             const cc = document.createElement("div");
             cc.className = "caption-container";
-            const albnme = document.createElement("p");
+            const albnme = document.createElement("a");
             albnme.id = "caption";
+            //albnme.style.color = "white";
             cc.appendChild(albnme);
             container.appendChild(cc);
             //thumbnails
@@ -103,6 +117,7 @@
                 thumb.src = albums[album].artworkUrl60;
                 thumb.style.width = "100%";
                 thumb.alt = albums[album].collectionName;
+                thumb.title = albums[album].collectionViewUrl;
                 thumb.onclick = function(){currentSlide(col.id)};
                 col.appendChild(thumb);
                 row.appendChild(col);
@@ -122,8 +137,11 @@
         // Thumbnail image controls
         function currentSlide(n) {
             showSlides(slideIndex = n);
+            //todo add back to top
+            window.scrollTo({top: 0})
         }
 
+        //changes display
         function showSlides(n) {
             let i;
             let slides = document.getElementsByClassName("slide");
@@ -139,8 +157,16 @@
             }
             slides[slideIndex-1].style.display = "flex";
             dots[slideIndex-1].className += " active";
-            captionText.innerHTML = dots[slideIndex-1].alt;
+            captionText.innerHTML = dots[slideIndex-1].alt;//todo add link
+            captionText.href = dots[slideIndex-1].title;
         }
 
+        //function to format date
+        function formatDate(date = new Date()){
+            const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+            const suffix = (date.getDate()%100 === 11) ? "th":(date.getDate()%10 === 1) ? "st":(date.getDate()%10 === 2) ? "nd":(date.getDate()%10 === 3) ? "rd":"th";
+            return `${days[date.getDay()]}, ${months[date.getMonth()]} ${date.getDate()}${suffix}, ${date.getFullYear()}`;
+        }
     </script>
 </html>
